@@ -63,7 +63,7 @@ lineToEvalForm input = either (throw . PError . show  )  eval $ readExpr input
 
 
 evalFile :: FilePath -> T.Text -> IO () --program file
-evalFile filePath fileExpr = (runASTinEnv basicEnv $ fileToEvalForm filePath fileExpr) >>= print
+evalFile filePath fileExpr = runASTinEnv basicEnv (fileToEvalForm filePath fileExpr) >>= print
 
 fileToEvalForm :: FilePath -> T.Text -> Eval LispVal
 fileToEvalForm filePath input = either (throw . PError . show )  evalBody $ readExprFile filePath input

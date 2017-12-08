@@ -37,7 +37,7 @@ data LispVal
 instance Show LispVal where
   show = T.unpack . showVal
 
-data IFunc = IFunc { fn :: [LispVal] -> Eval LispVal }
+newtype IFunc = IFunc { fn :: [LispVal] -> Eval LispVal }
   deriving (Typeable)
 
 instance Eq IFunc where

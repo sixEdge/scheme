@@ -41,11 +41,11 @@ primEnv = [
   , ("bl-eq?", mkF $ binop $ eqOp (==))
   , ("and"   , mkF $ binopFold (eqOp (&&)) (Bool True))
   , ("or"    , mkF $ binopFold (eqOp (||)) (Bool False))
-  , ("not"   , mkF $ unop $ notOp)
-  , ("cons"  , mkF $ Prim.cons)
-  , ("cdr"   , mkF $ Prim.cdr)
-  , ("car"   , mkF $ Prim.car)
-  , ("quote" , mkF $ quote)
+  , ("not"   , mkF $ unop notOp)
+  , ("cons"  , mkF Prim.cons)
+  , ("cdr"   , mkF Prim.cdr)
+  , ("car"   , mkF Prim.car)
+  , ("quote" , mkF quote)
   , ("file?" , mkF $ unop fileExists)
   , ("slurp" , mkF $ unop slurp)
   , ("wslurp", mkF $ unop wSlurp)
@@ -86,7 +86,7 @@ readTextFile :: T.Text -> Handle -> IO LispVal
 readTextFile fileName handle = do
   exists <- doesFileExist $ T.unpack fileName
   if exists
-  then (TIO.hGetContents handle) >>= (return . String)
+  then String <$> TIO.hGetContents handle
   else throw $ IOError $ T.concat [" file does not exits: ", fileName]
 
 put :: LispVal -> LispVal -> Eval LispVal
@@ -102,7 +102,7 @@ putTextFile :: T.Text -> T.Text -> Handle -> IO LispVal
 putTextFile fileName msg handle = do
   canWrite <- hIsWritable handle
   if canWrite
-  then (TIO.hPutStr handle msg) >> (return $ String msg)
+  then TIO.hPutStr handle msg >> return (String msg)
   else throw $ IOError $ T.concat [" file does not exits: ", fileName]
 
 binopFold :: Binary -> LispVal -> [LispVal] -> Eval LispVal

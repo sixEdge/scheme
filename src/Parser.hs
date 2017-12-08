@@ -68,8 +68,8 @@ decimal = Tok.decimal lexer
 -- | Parse a sign, return either @id@ or @negate@ based on the sign parsed.
 -- Copied from Text.Parsec.Token
 sign :: Parser (Integer -> Integer)
-sign = char '-' *> return negate
-   <|> char '+' *> return id
+sign = negate <$ char '-'
+   <|> id <$ char '+'
    <|> return id
 
 intRadix :: Radix -> Parser Integer
@@ -79,12 +79,12 @@ textLiteral :: Parser T.Text
 textLiteral = T.pack <$> Tok.stringLiteral lexer
 
 nil :: Parser ()
-nil = try ((char '\'') *> string "()") *> return () <?> "nil"
+nil = try (char '\'') *> string "()" *> return () <?> "nil"
 
 hashVal :: Parser LispVal
 hashVal = lexeme $ char '#'
-  *> (char 't' *> return (Bool True)
-  <|> char 'f' *> return (Bool False)
+  *> (Bool True <$ char 't'
+  <|> Bool False <$ char 'f'
   <|> char 'b' *> (Number <$> intRadix (2, oneOf "01"))
   <|> char 'o' *> (Number <$> intRadix (8, octDigit))
   <|> char 'd' *> (Number <$> intRadix (10, digit))
@@ -108,7 +108,7 @@ manyLispVal = lispVal `sepBy` whitespace
 
 _Quote :: LispVal -> LispVal
 _Quote x = List [Atom "quote", x]
-
+                                                                      
 contents p = whitespace *> lexeme p <* eof
 
 readExpr :: T.Text -> Either ParseError LispVal

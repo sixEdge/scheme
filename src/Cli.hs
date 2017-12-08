@@ -7,6 +7,7 @@ import Repl -- Repl.mainLoop :: IO ()
 import System.Directory
 import Data.Text.IO as TIO
 import Options.Applicative
+import Data.Semigroup ((<>))
 
 -- SOURCES
 --http://book.realworldhaskell.org/read/io.html
